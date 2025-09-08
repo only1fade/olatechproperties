@@ -16,6 +16,14 @@
       "dest": "/admin.html"
     },
     {
+      "src": "/admin-panel",
+      "dest": "/admin-panel.html"
+    },
+    {
+      "src": "/admin-panel.html",
+      "dest": "/admin-panel.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/$1"
     }
@@ -44,6 +52,15 @@
     },
     {
       "source": "/admin.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/admin-panel.html",
       "headers": [
         {
           "key": "Cache-Control",
