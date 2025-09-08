@@ -2,6 +2,8 @@
 
 A comprehensive e-commerce website for furniture, properties, and automotive products with an integrated admin panel for product management.
 
+**Latest Update**: Supabase integration completed for real-time database synchronization.
+
 ## Features
 
 ### Customer Features
