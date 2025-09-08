@@ -1,4 +1,7 @@
 // Admin Panel JavaScript
+console.warn('⚠️ OLD ADMIN.JS LOADED - THIS SHOULD NOT HAPPEN!');
+console.warn('⚠️ This uses localStorage - should be using admin-supabase.js instead');
+
 class AdminPanel {
     constructor() {
         this.products = JSON.parse(localStorage.getItem('adminProducts')) || [];

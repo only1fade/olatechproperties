@@ -1,4 +1,7 @@
 // Admin Panel JavaScript with Supabase Integration
+console.log('🚀 LOADING ADMIN-SUPABASE.JS - VERSION 4.0 - SUPABASE INTEGRATION');
+console.log('📅 This should use SUPABASE, not localStorage!');
+
 class AdminPanel {
     constructor() {
         this.supabase = window.supabaseClient;

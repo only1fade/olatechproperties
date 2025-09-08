@@ -574,11 +574,22 @@
     </div>
 
     <!-- Supabase Configuration -->
-    <script src="supabase-config.js"></script>
-    <script src="supabase-service.js"></script>
+    <script src="supabase-config.js?v=4.0"></script>
+    <script src="supabase-service.js?v=4.0"></script>
     
     <!-- Admin Scripts -->
-    <script src="script.js"></script>
-    <script src="admin-supabase.js"></script>
+    <script src="script.js?v=4.0"></script>
+    <script src="admin-supabase.js?v=4.0"></script>
+    
+    <script>
+        console.log('🔍 Checking which admin script loaded...');
+        setTimeout(() => {
+            if (window.adminPanel && window.adminPanel.supabase) {
+                console.log('✅ SUCCESS: Supabase admin panel loaded!');
+            } else {
+                console.error('❌ ERROR: Still using localStorage admin panel!');
+            }
+        }, 1000);
+    </script>
 </body>
 </html>
