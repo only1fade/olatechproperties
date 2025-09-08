@@ -29,27 +29,33 @@ class SupabaseService {
     // Add a new product
     async addProduct(productData) {
         try {
+            console.log('SupabaseService: Adding product:', productData);
+            
+            const insertData = {
+                name: productData.name,
+                price: productData.price,
+                description: productData.description,
+                category: productData.category,
+                image: productData.image,
+                created_at: new Date().toISOString()
+            };
+            
+            console.log('SupabaseService: Insert data:', insertData);
+            
             const { data, error } = await this.supabase
                 .from('products')
-                .insert([{
-                    name: productData.name,
-                    price: productData.price,
-                    description: productData.description,
-                    category: productData.category,
-                    image: productData.image,
-                    created_at: new Date().toISOString()
-                }])
+                .insert([insertData])
                 .select();
 
             if (error) {
-                console.error('Error adding product:', error);
+                console.error('SupabaseService: Error adding product:', error);
                 throw error;
             }
 
-            console.log('Product added successfully:', data);
+            console.log('SupabaseService: Product added successfully:', data);
             return data[0];
         } catch (error) {
-            console.error('Add product error:', error);
+            console.error('SupabaseService: Add product error:', error);
             throw error;
         }
     }

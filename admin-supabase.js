@@ -23,10 +23,31 @@ class AdminPanel {
     }
 
     async init() {
+        console.log('Initializing admin panel...');
+        
         // Initialize database connection
         if (!this.supabase) {
             console.error('Supabase client not initialized. Please check your configuration.');
+            alert('Supabase connection failed! Check console for details.');
             this.showError('Database connection failed. Please check configuration.');
+            return;
+        }
+        
+        console.log('Supabase client initialized:', this.supabase);
+
+        // Test Supabase connection
+        try {
+            console.log('Testing Supabase connection...');
+            const { data, error } = await this.supabase.from('products').select('count', { count: 'exact', head: true });
+            if (error) {
+                console.error('Supabase connection test failed:', error);
+                alert(`Supabase connection failed: ${error.message}. Please make sure you've created the products table in your Supabase dashboard.`);
+                return;
+            }
+            console.log('Supabase connection successful! Product count:', data);
+        } catch (testError) {
+            console.error('Supabase connection test error:', testError);
+            alert(`Database connection test failed: ${testError.message}`);
             return;
         }
 
@@ -43,6 +64,8 @@ class AdminPanel {
         this.displayProducts();
         this.setupImageUpload();
         this.setupRealTimeUpdates();
+        
+        console.log('Admin panel initialization complete!');
     }
 
     setupEventListeners() {
@@ -190,12 +213,16 @@ class AdminPanel {
         };
 
         try {
+            console.log('Adding product to Supabase:', productData);
+            
             // Check if this is an edit operation
             const editId = form.dataset.editId;
             
             if (editId) {
                 // Update existing product
-                await window.supabaseService.updateProduct(editId, productData);
+                console.log('Updating product with ID:', editId);
+                const result = await window.supabaseService.updateProduct(editId, productData);
+                console.log('Product update result:', result);
                 this.showSuccess(`Product "${name}" has been updated successfully!`);
                 
                 // Reset edit mode
@@ -204,11 +231,14 @@ class AdminPanel {
                 submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Product';
             } else {
                 // Add new product
-                await window.supabaseService.addProduct(productData);
+                console.log('Adding new product...');
+                const result = await window.supabaseService.addProduct(productData);
+                console.log('Product add result:', result);
                 this.showSuccess(`Product "${name}" has been added successfully!`);
             }
 
             // Reload products and update display
+            console.log('Reloading products...');
             await this.loadProducts();
             this.updateDashboard();
             this.displayProducts();
