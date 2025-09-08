@@ -3,6 +3,7 @@
 const SUPABASE_URL = 'https://axxwhwyfsmwjmtcprkxr.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4eHdod3lmc213am10Y3Bya3hyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczNTU4MDEsImV4cCI6MjA3MjkzMTgwMX0.0PWxtI8vM_kOIkd5YuDVuu45-5nEJE-e0shcvDG5EZw'
 
+console.log('🚀 SUPABASE CONFIG LOADED - VERSION 2.0 - DEPLOYMENT TEST');
 console.log('Loading Supabase configuration...');
 console.log('Supabase URL:', SUPABASE_URL);
 console.log('Supabase Key length:', SUPABASE_ANON_KEY.length);
