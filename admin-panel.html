@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUPABASE Admin Panel - OLATECH PROPERTIES AND ASSETS</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- FORCE SUPABASE VERSION CHECK -->
+    <script>
+        console.log('🚀 NEW ADMIN-PANEL.HTML - FORCING SUPABASE INTEGRATION');
+        console.log('📅 Fresh deployment: ' + new Date().toISOString());
+    </script>
+    
+    <style>
+        /* Admin Panel Global Styles */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+        }
+        
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .admin-header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+        
+        .version-info {
+            background: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .admin-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .tab-btn.active {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .tab-btn:hover {
+            background: #ff5252;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            overflow-x: auto;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Dashboard Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* Form Styles */
+        .product-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #ff6b6b;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+        
+        .image-upload {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .image-upload:hover {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.05);
+        }
+        
+        .image-preview {
+            display: none;
+            margin-top: 15px;
+        }
+        
+        .image-preview img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #ff5252;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .admin-product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .admin-product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .admin-product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .admin-product-info {
+            padding: 20px;
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-edit {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+        }
+        
+        .notification.success {
+            background: #28a745;
+        }
+        
+        .notification.error {
+            background: #dc3545;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 10px;
+            }
+            
+            .product-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-tabs {
+                flex-direction: column;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Container -->
+    <div class="admin-container">
+        <!-- Version Info -->
+        <div class="version-info">
+            ✅ SUPABASE ADMIN PANEL v5.0 - This version FORCES Supabase integration!
+        </div>
+        
+        <!-- Admin Header -->
+        <div class="admin-header">
+            <h1><i class="fas fa-database"></i> Supabase Admin Panel</h1>
+            <p>Manage your products with real database storage</p>
+        </div>
+
+        <!-- Admin Tabs -->
+        <div class="admin-tabs">
+            <button class="tab-btn active" data-tab="dashboard">
+                <i class="fas fa-chart-bar"></i> Dashboard
+            </button>
+            <button class="tab-btn" data-tab="add-product">
+                <i class="fas fa-plus"></i> Add Product
+            </button>
+            <button class="tab-btn" data-tab="manage-products">
+                <i class="fas fa-boxes"></i> Manage Products
+            </button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <h2>Dashboard Overview</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalProducts">0</div>
+                    <div class="stat-label">Total Products</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="furnitureCount">0</div>
+                    <div class="stat-label">Furniture Items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="propertyCount">0</div>
+                    <div class="stat-label">Properties</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="autoCount">0</div>
+                    <div class="stat-label">Auto Items</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #e8f5e8; border-radius: 10px; border-left: 4px solid #28a745;">
+                <h3 style="color: #155724; margin-bottom: 15px;"><i class="fas fa-database"></i> Supabase Integration Active</h3>
+                <ul style="color: #155724; line-height: 1.8;">
+                    <li><strong>✅ Real Database:</strong> Products are stored in PostgreSQL via Supabase</li>
+                    <li><strong>✅ Cross-Device Sync:</strong> Products appear on all devices automatically</li>
+                    <li><strong>✅ Real-time Updates:</strong> Changes sync instantly across browsers</li>
+                    <li><strong>✅ Persistent Storage:</strong> Data is safely backed up and secure</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Add Product Tab -->
+        <div id="add-product" class="tab-content">
+            <h2>Add New Product</h2>
+            <form id="productForm" class="product-form">
+                <div class="form-group">
+                    <label for="productName">Product Name</label>
+                    <input type="text" id="productName" name="productName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="productPrice">Price</label>
+                    <input type="text" id="productPrice" name="productPrice" placeholder="$0.00" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="productCategory">Category</label>
+                    <select id="productCategory" name="productCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="furniture">Furniture</option>
+                        <option value="properties">Properties</option>
+                        <option value="auto">Auto</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="productDescription">Description</label>
+                    <textarea id="productDescription" name="productDescription" rows="4"></textarea>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label>Product Image</label>
+                    <div class="image-upload" onclick="document.getElementById('imageInput').click()">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #ff6b6b; margin-bottom: 10px;"></i>
+                        <p>Click here to upload an image</p>
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                    </div>
+                    <div class="image-preview" id="imagePreview">
+                        <img id="previewImg" src="" alt="Preview">
+                    </div>
+                </div>
+                
+                <div class="form-group full-width">
+                    <button type="submit" class="btn" style="width: 100%; padding: 15px; font-size: 1.1rem;">
+                        <i class="fas fa-database"></i> Save to Supabase Database
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Manage Products Tab -->
+        <div id="manage-products" class="tab-content">
+            <h2>Manage Products</h2>
+            <div id="productsContainer" class="products-grid">
+                <!-- Products will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Direct Inline Supabase Integration -->
+    <script>
+        console.log('🔧 INITIALIZING DIRECT SUPABASE INTEGRATION...');
+        
+        // Supabase Configuration (Direct)
+        const SUPABASE_URL = 'https://axxwhwyfsmwjmtcprkxr.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4eHdod3lmc213am10Y3Bya3hyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczNTU4MDEsImV4cCI6MjA3MjkzMTgwMX0.0PWxtI8vM_kOIkd5YuDVuu45-5nEJE-e0shcvDG5EZw';
+        
+        // Initialize Supabase Client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase client created:', supabase);
+        
+        // Admin Panel Class (Simplified)
+        class SupabaseAdminPanel {
+            constructor() {
+                this.products = [];
+                this.checkAuth();
+                this.init();
+            }
+            
+            checkAuth() {
+                const isAuthenticated = sessionStorage.getItem('adminAuthenticated');
+                if (!isAuthenticated) {
+                    const password = prompt('Enter admin password:');
+                    if (password === 'admin123') {
+                        sessionStorage.setItem('adminAuthenticated', 'true');
+                    } else {
+                        alert('Access denied. Redirecting...');
+                        window.location.href = 'index.html';
+                        return;
+                    }
+                }
+            }
+            
+            async init() {
+                console.log('🚀 Initializing Supabase Admin Panel...');
+                this.setupEventListeners();
+                await this.loadProducts();
+                this.updateDashboard();
+                this.displayProducts();
+            }
+            
+            setupEventListeners() {
+                // Tab switching
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const tabId = e.target.dataset.tab;
+                        this.showTab(tabId);
+                    });
+                });
+                
+                // Form submission
+                document.getElementById('productForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addProduct();
+                });
+                
+                // Image upload
+                document.getElementById('imageInput').addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        this.handleImageUpload(e.target.files[0]);
+                    }
+                });
+            }
+            
+            handleImageUpload(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            async loadProducts() {
+                try {
+                    console.log('📦 Loading products from Supabase...');
+                    const { data, error } = await supabase
+                        .from('products')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+                    
+                    if (error) {
+                        console.error('❌ Error loading products:', error);
+                        this.showNotification('Failed to load products: ' + error.message, 'error');
+                        return;
+                    }
+                    
+                    this.products = data || [];
+                    console.log('✅ Products loaded:', this.products.length);
+                } catch (error) {
+                    console.error('❌ Exception loading products:', error);
+                    this.showNotification('Database connection failed', 'error');
+                }
+            }
+            
+            async addProduct() {
+                const form = document.getElementById('productForm');
+                const formData = new FormData(form);
+                const previewImg = document.getElementById('previewImg');
+                
+                const productData = {
+                    name: formData.get('productName').trim(),
+                    price: formData.get('productPrice').trim(),
+                    category: formData.get('productCategory'),
+                    description: formData.get('productDescription').trim() || '',
+                    image: previewImg.src
+                };
+                
+                if (!productData.name || !productData.price || !productData.category) {
+                    this.showNotification('Please fill in all required fields', 'error');
+                    return;
+                }
+                
+                try {
+                    console.log('💾 Saving product to Supabase:', productData);
+                    const { data, error } = await supabase
+                        .from('products')
+                        .insert([productData])
+                        .select();
+                    
+                    if (error) {
+                        console.error('❌ Error saving product:', error);
+                        this.showNotification('Failed to save product: ' + error.message, 'error');
+                        return;
+                    }
+                    
+                    console.log('✅ Product saved successfully:', data);
+                    this.showNotification('Product saved to Supabase database!', 'success');
+                    
+                    // Reload and refresh
+                    await this.loadProducts();
+                    this.updateDashboard();
+                    this.displayProducts();
+                    
+                    // Reset form
+                    form.reset();
+                    document.getElementById('imagePreview').style.display = 'none';
+                    
+                } catch (error) {
+                    console.error('❌ Exception saving product:', error);
+                    this.showNotification('Database error: ' + error.message, 'error');
+                }
+            }
+            
+            updateDashboard() {
+                const totalProducts = this.products.length;
+                const furnitureCount = this.products.filter(p => p.category === 'furniture').length;
+                const propertyCount = this.products.filter(p => p.category === 'properties').length;
+                const autoCount = this.products.filter(p => p.category === 'auto').length;
+                
+                const elements = {
+                    totalProducts: document.getElementById('totalProducts'),
+                    furnitureCount: document.getElementById('furnitureCount'),
+                    propertyCount: document.getElementById('propertyCount'),
+                    autoCount: document.getElementById('autoCount')
+                };
+                
+                if (elements.totalProducts) elements.totalProducts.textContent = totalProducts;
+                if (elements.furnitureCount) elements.furnitureCount.textContent = furnitureCount;
+                if (elements.propertyCount) elements.propertyCount.textContent = propertyCount;
+                if (elements.autoCount) elements.autoCount.textContent = autoCount;
+            }
+            
+            displayProducts() {
+                const container = document.getElementById('productsContainer');
+                if (!container) return;
+                
+                if (this.products.length === 0) {
+                    container.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                            <i class="fas fa-database" style="font-size: 3rem; margin-bottom: 20px; color: #28a745;"></i>
+                            <h3>Supabase Database Ready</h3>
+                            <p>No products found in database. Add your first product using the "Add Product" tab.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = this.products.map(product => `
+                    <div class="admin-product-card">
+                        <img src="${product.image}" alt="${product.name}">
+                        <div class="admin-product-info">
+                            <h3>${product.name}</h3>
+                            <div style="color: #ff6b6b; font-weight: 600; margin: 10px 0;">${product.price}</div>
+                            <div style="background: #f8f9fa; padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; color: #666; display: inline-block; margin-bottom: 10px;">${product.category}</div>
+                            <p>${product.description || 'No description'}</p>
+                            <div class="admin-actions">
+                                <button class="btn-edit" onclick="adminPanel.deleteProduct('${product.id}')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            async deleteProduct(productId) {
+                if (!confirm('Are you sure you want to delete this product?')) return;
+                
+                try {
+                    const { error } = await supabase
+                        .from('products')
+                        .delete()
+                        .eq('id', productId);
+                    
+                    if (error) {
+                        this.showNotification('Failed to delete product', 'error');
+                        return;
+                    }
+                    
+                    this.showNotification('Product deleted successfully', 'success');
+                    await this.loadProducts();
+                    this.updateDashboard();
+                    this.displayProducts();
+                } catch (error) {
+                    this.showNotification('Delete failed: ' + error.message, 'error');
+                }
+            }
+            
+            showTab(tabId) {
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                const targetTab = document.getElementById(tabId);
+                const targetBtn = document.querySelector(`[data-tab="${tabId}"]`);
+                
+                if (targetTab) targetTab.classList.add('active');
+                if (targetBtn) targetBtn.classList.add('active');
+            }
+            
+            showNotification(message, type) {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : 'exclamation-triangle'}"></i> ${message}`;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 4000);
+            }
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎯 Starting Supabase Admin Panel...');
+            window.adminPanel = new SupabaseAdminPanel();
+        });
+    </script>
+</body>
+</html>
