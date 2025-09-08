@@ -87,6 +87,14 @@ class AdminPanel {
                 this.showTab(tabId);
             });
         });
+        
+        // Filter functionality
+        const filterSelect = document.getElementById('filterCategory');
+        if (filterSelect) {
+            filterSelect.addEventListener('change', () => {
+                this.filterProducts();
+            });
+        }
     }
 
     setupImageUpload() {
@@ -311,14 +319,25 @@ class AdminPanel {
         const propertyCount = this.products.filter(p => p.category === 'properties').length;
         const autoCount = this.products.filter(p => p.category === 'auto').length;
 
-        document.getElementById('totalProducts').textContent = totalProducts;
-        document.getElementById('furnitureCount').textContent = furnitureCount;
-        document.getElementById('propertyCount').textContent = propertyCount;
-        document.getElementById('autoCount').textContent = autoCount;
+        // Safely update dashboard elements
+        const totalEl = document.getElementById('totalProducts');
+        const furnitureEl = document.getElementById('furnitureCount');
+        const propertyEl = document.getElementById('propertyCount');
+        const autoEl = document.getElementById('autoCount');
+        
+        if (totalEl) totalEl.textContent = totalProducts;
+        if (furnitureEl) furnitureEl.textContent = furnitureCount;
+        if (propertyEl) propertyEl.textContent = propertyCount;
+        if (autoEl) autoEl.textContent = autoCount;
     }
 
     displayProducts() {
         const productsContainer = document.getElementById('productsContainer');
+        
+        if (!productsContainer) {
+            console.error('Products container not found');
+            return;
+        }
         
         if (this.products.length === 0) {
             productsContainer.innerHTML = `
@@ -331,7 +350,17 @@ class AdminPanel {
             return;
         }
 
-        productsContainer.innerHTML = this.products.map(product => `
+        // Get filter value
+        const filterSelect = document.getElementById('filterCategory');
+        const filterValue = filterSelect ? filterSelect.value : 'all';
+        
+        // Filter products
+        let filteredProducts = this.products;
+        if (filterValue !== 'all') {
+            filteredProducts = this.products.filter(p => p.category === filterValue);
+        }
+
+        productsContainer.innerHTML = filteredProducts.map(product => `
             <div class="admin-product-card">
                 <img src="${product.image}" alt="${product.name}" onerror="this.src='images/placeholder.svg'">
                 <div class="admin-product-info">
@@ -351,21 +380,33 @@ class AdminPanel {
             </div>
         `).join('');
     }
+    
+    filterProducts() {
+        this.displayProducts();
+    }
 
     showTab(tabId) {
         // Hide all tab contents
         document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.remove('active');
+            if (content) content.classList.remove('active');
         });
         
         // Remove active class from all tab buttons
         document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active');
+            if (btn) btn.classList.remove('active');
         });
         
         // Show selected tab content
-        document.getElementById(tabId).classList.add('active');
-        document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+        const targetTab = document.getElementById(tabId);
+        if (targetTab) {
+            targetTab.classList.add('active');
+        }
+        
+        // Activate corresponding tab button
+        const targetBtn = document.querySelector(`[data-tab="${tabId}"]`);
+        if (targetBtn) {
+            targetBtn.classList.add('active');
+        }
     }
 
     showSuccess(message) {

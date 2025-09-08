@@ -323,13 +323,13 @@
 
         <!-- Admin Tabs -->
         <div class="admin-tabs">
-            <button class="tab-btn active" onclick="showTab('dashboard')">
+            <button class="tab-btn active" data-tab="dashboard">
                 <i class="fas fa-chart-bar"></i> Dashboard
             </button>
-            <button class="tab-btn" onclick="showTab('add-product')">
+            <button class="tab-btn" data-tab="add-product">
                 <i class="fas fa-plus"></i> Add Product
             </button>
-            <button class="tab-btn" onclick="showTab('manage-products')">
+            <button class="tab-btn" data-tab="manage-products">
                 <i class="fas fa-boxes"></i> Manage Products
             </button>
         </div>
@@ -347,7 +347,7 @@
                     <div class="stat-label">Furniture Items</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="propertiesCount">0</div>
+                    <div class="stat-number" id="propertyCount">0</div>
                     <div class="stat-label">Properties</div>
                 </div>
                 <div class="stat-card">
@@ -430,14 +430,14 @@
             <h2>Manage Products</h2>
             <div class="form-group" style="max-width: 300px;">
                 <label for="filterCategory">Filter by Category</label>
-                <select id="filterCategory" onchange="filterProducts()">
+                <select id="filterCategory">
                     <option value="all">All Categories</option>
                     <option value="furniture">Furniture</option>
                     <option value="properties">Properties</option>
                     <option value="auto">Auto</option>
                 </select>
             </div>
-            <div id="productsGrid" class="products-grid">
+            <div id="productsContainer" class="products-grid">
                 <!-- Products will be displayed here -->
             </div>
         </div>
