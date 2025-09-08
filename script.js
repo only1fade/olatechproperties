@@ -462,27 +462,24 @@ document.addEventListener('DOMContentLoaded', function() {
         // Admin products appear only in their respective category pages
     }
 
-    // Function to load category-specific products
-    function loadCategoryProducts() {
+    // Function to load category-specific products from Supabase
+    async function loadCategoryProducts() {
         const currentPage = window.location.pathname.split('/').pop();
-        let categoryProducts = [];
+        let category = '';
         let containerSelector = '';
         
         switch(currentPage) {
             case 'furniture.html':
-                categoryProducts = JSON.parse(localStorage.getItem('furnitureProducts')) || [];
+                category = 'furniture';
                 containerSelector = '.furniture-grid';
-                console.log('Loading furniture products:', categoryProducts.length);
                 break;
             case 'properties.html':
-                categoryProducts = JSON.parse(localStorage.getItem('propertyProducts')) || [];
+                category = 'properties';
                 containerSelector = '.property-grid';
-                console.log('Loading property products:', categoryProducts.length);
                 break;
             case 'auto.html':
-                categoryProducts = JSON.parse(localStorage.getItem('autoProducts')) || [];
+                category = 'auto';
                 containerSelector = '.auto-grid';
-                console.log('Loading auto products:', categoryProducts.length);
                 break;
             default:
                 return; // Not a category page
@@ -495,13 +492,77 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        console.log('Container found:', containerSelector, 'Products to display:', categoryProducts.length);
+        console.log('Loading products for category:', category);
         
-        // Clear existing content
+        try {
+            // Check if Supabase is available
+            if (!window.supabaseService) {
+                console.log('Supabase not available, falling back to localStorage');
+                loadCategoryProductsFromLocalStorage();
+                return;
+            }
+            
+            // Load products from Supabase
+            const categoryProducts = await window.supabaseService.getProductsByCategory(category);
+            console.log('Loaded products from Supabase:', categoryProducts.length);
+            
+            // Clear existing content
+            container.innerHTML = '';
+            
+            if (categoryProducts.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                        <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.5;"></i>
+                        <h3>No products available yet</h3>
+                        <p>Check back later for new ${category} products.</p>
+                        <button onclick="loadCategoryProducts()" class="btn" style="margin-top: 20px;">Refresh Products</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Display products
+            categoryProducts.forEach(product => {
+                const productCard = createProductCard(product, category);
+                container.appendChild(productCard);
+            });
+            
+        } catch (error) {
+            console.error('Error loading products from Supabase:', error);
+            // Fallback to localStorage
+            loadCategoryProductsFromLocalStorage();
+        }
+    }
+
+    // Fallback function to load from localStorage
+    function loadCategoryProductsFromLocalStorage() {
+        const currentPage = window.location.pathname.split('/').pop();
+        let categoryProducts = [];
+        let containerSelector = '';
+        
+        switch(currentPage) {
+            case 'furniture.html':
+                categoryProducts = JSON.parse(localStorage.getItem('furnitureProducts')) || [];
+                containerSelector = '.furniture-grid';
+                break;
+            case 'properties.html':
+                categoryProducts = JSON.parse(localStorage.getItem('propertyProducts')) || [];
+                containerSelector = '.property-grid';
+                break;
+            case 'auto.html':
+                categoryProducts = JSON.parse(localStorage.getItem('autoProducts')) || [];
+                containerSelector = '.auto-grid';
+                break;
+            default:
+                return;
+        }
+        
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+        
         container.innerHTML = '';
         
         if (categoryProducts.length === 0) {
-            // Show message when no products are available
             container.innerHTML = `
                 <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
                     <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.5;"></i>
@@ -513,31 +574,36 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Display category products
         categoryProducts.forEach(product => {
-            const productCard = document.createElement('div');
-            
-            // Use appropriate card class based on category
-            let cardClass = 'product-card';
-            if (currentPage === 'properties.html') cardClass = 'property-card';
-            if (currentPage === 'auto.html') cardClass = 'auto-card';
-            
-            productCard.className = cardClass;
-            productCard.dataset.category = product.category;
-            
-            productCard.innerHTML = `
-                <img src="${product.image}" alt="${product.name}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='">
-                <div class="product-info">
-                    <h3>${product.name}</h3>
-                    <p class="price">${product.price}</p>
-                    ${product.condition ? `<span class="condition-tag">${product.condition}</span>` : ''}
-                    ${product.description ? `<p class="description">${product.description.substring(0, 100)}${product.description.length > 100 ? '...' : ''}</p>` : ''}
-                    <button class="add-to-cart">Add to Cart</button>
-                </div>
-            `;
-            
+            const productCard = createProductCard(product, product.category);
             container.appendChild(productCard);
         });
+    }
+
+    // Helper function to create product cards
+    function createProductCard(product, category) {
+        const productCard = document.createElement('div');
+        
+        // Use appropriate card class based on category
+        let cardClass = 'product-card';
+        if (category === 'properties') cardClass = 'property-card';
+        if (category === 'auto') cardClass = 'auto-card';
+        
+        productCard.className = cardClass;
+        productCard.dataset.category = product.category;
+        
+        productCard.innerHTML = `
+            <img src="${product.image}" alt="${product.name}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='">
+            <div class="product-info">
+                <h3>${product.name}</h3>
+                <p class="price">${product.price}</p>
+                ${product.condition ? `<span class="condition-tag">${product.condition}</span>` : ''}
+                ${product.description ? `<p class="description">${product.description.substring(0, 100)}${product.description.length > 100 ? '...' : ''}</p>` : ''}
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+        `;
+        
+        return productCard;
     }
 
     // Make loadCategoryProducts globally accessible
