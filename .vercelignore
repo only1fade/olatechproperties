@@ -1,0 +1,39 @@
+# Files to exclude from Vercel deployment
+# Development files
+dev-server.js
+package-lock.json
+
+# Git files  
+.git/
+.gitignore
+
+# Documentation (optional - remove if you want README deployed)
+README.md
+LICENSE
+
+# Development dependencies (node_modules already ignored by default)
+node_modules/
+
+# Logs and temporary files
+*.log
+tmp/
+temp/
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IMPORTANT: Everything else WILL be deployed
+# This includes:
+# - All HTML files (*.html)
+# - All JavaScript files (*.js) 
+# - All CSS files (*.css)
+# - All SQL files (*.sql)
+# - All image files (images/*)
+# - All configuration files (vercel.json, supabase-config.js, etc.)

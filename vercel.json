@@ -6,6 +6,8 @@
       "use": "@vercel/static"
     }
   ],
+  "functions": {},
+  "outputDirectory": ".",
   "routes": [
     {
       "src": "/admin",
@@ -67,6 +69,42 @@
           "value": "no-cache, no-store, must-revalidate"
         }
       ]
+    },
+    {
+      "source": "**/*.sql",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    },
+    {
+      "source": "**/*.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "**/*.css",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/css; charset=utf-8"
+        }
+      ]
     }
-  ]
+  ],
+  "trailingSlash": false,
+  "cleanUrls": true,
+  "github": {
+    "silent": false
+  }
 }
