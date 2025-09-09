@@ -179,9 +179,9 @@ class AdminPanel {
             value = parts[0] + '.' + parts[1].substring(0, 2);
         }
         
-        // Add dollar sign
+        // Add naira sign
         if (value) {
-            input.value = '$' + value;
+            input.value = '₦' + value;
         }
     }
 

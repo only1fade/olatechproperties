@@ -66,12 +66,12 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             cartItems.appendChild(cartItem);
             
-            // Extract price number for total calculation
-            const price = parseFloat(item.price.replace(/[$,]/g, ''));
+            // Extract price number for total calculation (handle both $ and ₦)
+            const price = parseFloat(item.price.replace(/[₦$,]/g, ''));
             totalPrice += price;
         });
         
-        total.textContent = `Total: $${totalPrice.toFixed(2)}`;
+        total.textContent = `Total: ₦${totalPrice.toFixed(2)}`;
         modal.style.display = 'block';
     }
     
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="cart-items"></div>
                 <div class="cart-footer">
-                    <div class="cart-total">Total: $0.00</div>
+                    <div class="cart-total">Total: ₦0.00</div>
                     <button class="checkout-btn">Checkout</button>
                 </div>
             </div>
