@@ -1,12 +1,4 @@
 {
-  "name": "olatech-properties",
-  "version": "1.0.0",
-  "description": "E-commerce website with Supabase integration",
-  "scripts": {
-    "dev": "node dev-server.js",
-    "build": "echo 'Static site - no build required'",
-    "start": "node dev-server.js"
-  },
   "devDependencies": {
     "http-server": "^14.1.1"
   },

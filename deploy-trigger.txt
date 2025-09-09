@@ -1,4 +1,0 @@
-DEPLOYMENT TRIGGER - admin-panel.html should be available
-Timestamp: 2025-01-09
-Files to deploy: admin-panel.html, vercel.json updates
-Expected URL: /admin-panel.html
